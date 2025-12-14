@@ -1,22 +1,20 @@
-import axios from 'axios'
 import { useEffect, useState } from 'react'
 import {
-  Filter,
   AddContact,
+  Filter,
   Persons
 } from './components'
+import personsService from './services/persons'
 
 const App = () => {
 
   const [persons, setPersons] = useState([])
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons")
-      .then(response => {
-        const personsData = response.data
-        setPersons(personsData)
-      })
-  }, [persons])
+
+    personsService.getAllPersons()
+      .then(persons => setPersons(persons))
+  }, [])
 
   const [nameFilter, setNameFilter] = useState('')
 
@@ -24,8 +22,17 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <Filter filter={nameFilter} setFilter={setNameFilter} />
-      <AddContact persons={persons} setPersons={setPersons} />
-      <Persons persons={persons} nameFilter={nameFilter} />
+      <AddContact
+        persons={persons}
+        setPersons={setPersons}
+        createPerson={personsService.createPerson}
+        updatePerson={personsService.updatePerson}
+      />
+      <Persons
+        persons={persons}
+        setPersons={setPersons}
+        nameFilter={nameFilter}
+        deletePerson={personsService.deletePerson} />
     </div>
   )
 }

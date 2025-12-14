@@ -1,6 +1,14 @@
-const Person = ({ name, number }) => <p>{name} {number}</p>
+const Person = ({ id, name, number, persons, setPersons, deletePerson }) => {
+  const handleDeletePerson = () =>  deletePerson(id).then(deletedPerson => {
+    setPersons(
+      persons.filter(person => person.id != deletedPerson.id)
+    )
+  })
 
-const Persons = ({ persons, nameFilter }) => {
+  return (<p>{name} {number} <button onClick={handleDeletePerson}>delete</button></p>);
+}
+
+const Persons = ({ persons, setPersons, nameFilter, deletePerson }) => {
   
   const NAME_MATCHES_FILTER = (name) => name.substring(0, nameFilter.trim().length).toLowerCase().trim() == nameFilter.toLowerCase().trim()
   const NAME_FILTER_IS_NOT_EMPTY = nameFilter.trim().length != 0
@@ -12,11 +20,27 @@ const Persons = ({ persons, nameFilter }) => {
         persons
           .filter(person => NAME_MATCHES_FILTER(person.name))
           .map(person =>
-            <Person key={person.name} name={person.name} number={person.number} />
+            <Person
+              key={person.name}
+              id={person.id}
+              name={person.name}
+              number={person.number}
+              persons={persons}
+              setPersons={setPersons}
+              deletePerson={deletePerson}
+            />
           )
         : persons
           .map(person =>
-            <Person key={person.name} name={person.name} number={person.number} />
+            <Person
+              key={person.name}
+              id={person.id}
+              name={person.name}
+              number={person.number}
+              persons={persons}
+              setPersons={setPersons}
+              deletePerson={deletePerson}
+            />
           )
       }
   </div>

@@ -1,6 +1,11 @@
 import { useState } from 'react'
 
-const AddContact = ({ persons, setPersons }) => {
+const AddContact = ({
+  persons,
+  setPersons,
+  createPerson,
+  updatePerson
+}) => {
 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
@@ -8,18 +13,35 @@ const AddContact = ({ persons, setPersons }) => {
   const addPerson = (event) => {
     event.preventDefault()
 
-    const newPerson = {
+    const newPersonObj = {
       name: newName,
       number: newNumber
     }
 
-    if (persons.filter(person => person.name == newPerson.name).length != 0) {
-      alert(`${newPerson.name} is already added to phonebook`)
-      setNewName('')
-      return;
+    const CONFIRM_UPDATE_MSG = `${newPersonObj.name} is already added to phonebook, replace the old number with new one?`
+
+    const existingPerson = persons.filter(person => person.name == newPersonObj.name)[0]
+
+    if (!!existingPerson) {
+      if (confirm(CONFIRM_UPDATE_MSG)) {
+        const updatedPersonObj = newPersonObj
+        updatePerson(existingPerson.id, updatedPersonObj).then(updatedPerson => {
+          setPersons(
+            persons.map(
+              person => person.id == updatedPerson.id ?
+                updatedPerson
+                : person
+            )
+          )
+        })
+      }
     }
 
-    setPersons([...persons, newPerson])
+    else {
+      createPerson(newPersonObj)
+        .then(newPerson => setPersons([...persons, newPerson]))
+    }
+
     setNewName('')
     setNewNumber('')
   }
