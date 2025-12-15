@@ -4,7 +4,9 @@ const AddContact = ({
   persons,
   setPersons,
   createPerson,
-  updatePerson
+  updatePerson,
+  notifTypes,
+  sendNotif
 }) => {
 
   const [newName, setNewName] = useState('')
@@ -25,21 +27,30 @@ const AddContact = ({
     if (!!existingPerson) {
       if (confirm(CONFIRM_UPDATE_MSG)) {
         const updatedPersonObj = newPersonObj
-        updatePerson(existingPerson.id, updatedPersonObj).then(updatedPerson => {
-          setPersons(
-            persons.map(
-              person => person.id == updatedPerson.id ?
-                updatedPerson
-                : person
+        updatePerson(existingPerson.id, updatedPersonObj)
+          .then(updatedPerson => {
+            setPersons(
+              persons.map(
+                person => person.id == updatedPerson.id ?
+                  updatedPerson
+                  : person
+              )
             )
-          )
-        })
+            sendNotif(notifTypes.UPDATE_SUCCESS, `Updated ${updatedPerson.name}'s number to ${updatedPerson.number}`)
+          })
+          .catch(err => {
+            sendNotif(notifTypes.ERR_404, `Information of ${updatedPersonObj.name} has already been removed from server.`)
+            setPersons(persons.filter(person => person.name != updatedPersonObj.name))
+          })
       }
     }
 
     else {
       createPerson(newPersonObj)
-        .then(newPerson => setPersons([...persons, newPerson]))
+        .then(newPerson => {
+          setPersons([...persons, newPerson])
+          sendNotif(notifTypes.CREATION_SUCCESS, `Added ${newPerson.name} to phonebook.`)
+        })
     }
 
     setNewName('')
