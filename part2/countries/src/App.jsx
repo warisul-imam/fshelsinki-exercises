@@ -9,9 +9,12 @@ function App() {
   
   const [countrySearch, setCountrySearch] = useState('');
 
-  const [country, setCountry] = useState(null)
+  const [country, setCountry] = useState(null);
+
+  const [weatherData, setWeatherData] = useState(null);
 
   const baseUrl = "https://studies.cs.helsinki.fi/restcountries/api"
+  const weatherUrl = (latlng) => `https://api.openweathermap.org/data/3.0/onecall?lat=${latlng[0]}&lon=${latlng[1]}&appid=${import.meta.env.VITE_WEATHER_API_KEY}`
 
   useEffect(() => {
     axios.get(`${baseUrl}/all`)
@@ -32,6 +35,11 @@ function App() {
       .then(res => res.data)
       .then(countryData => {
         setCountry(countryData)
+        console.log(countryData)
+
+        axios.get(weatherUrl(countryData.latlng))
+          .then(res => res.data)
+          .then(weatherData => setWeatherData(weatherData))
       })
     }
   }, [countryName])
@@ -62,12 +70,24 @@ function App() {
             <div>
               <h1>{country.name.common}</h1>
               <p>Capital: {country.capital[0]}</p>
-              <p>Area: {country.area}</p>
+              <p>Area: {country.area} sq. km</p>
               <h2>Languages</h2>
               <ul>
                 {Object.values(country.languages).map(language => <li key={language}>{language}</li>)}
               </ul>
               <img width={300} src={country.flags.svg} alt={country.flags.alt} />
+              <div>
+                <h2>Weather in {country.capital}</h2>
+                {
+                  weatherData ?
+                  <div>
+                    <p>Temperature: {Math.round(100*(weatherData.current.temp - 273.15))/100} <sup>o</sup> C</p>
+                    <img src={`https://openweathermap.org/img/w/${weatherData.current.weather[0].icon}.png`} alt={weatherData.current.weather[0].description} />
+                    <p>Wind: {weatherData.current.wind_speed} m/s</p>
+                  </div>
+                  : null
+                }
+              </div>
             </div>
           ) 
           : matchedCountries.map((country, index) => <p key={index}>{country} <button key={country} onClick={() => showCountry(country)}>show info</button></p>)
