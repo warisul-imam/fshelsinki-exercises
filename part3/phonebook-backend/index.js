@@ -1,6 +1,9 @@
-const morgan = require('morgan')
+const cors = require("cors")
 const express = require("express")
+const morgan = require("morgan")
 const app = express()
+
+app.use(cors())
 
 app.use(express.json())
 
@@ -79,11 +82,19 @@ app.post("/api/persons", (req, res) => {
 
 app.delete("/api/persons/:id", (req, res) => {
   const id = req.params.id
+
+  const contact = contacts.find(contact => contact.id == id)
+
+  if (!contact) {
+    return res.status(404).json({
+      error: "person not found"
+    })
+  }
+
   contacts = contacts.filter(person => person.id != id)
 
   res.status(204).end()
 })
-
 
 const PORT = 3001
 app.listen(PORT, () => {

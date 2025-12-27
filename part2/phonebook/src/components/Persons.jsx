@@ -1,9 +1,10 @@
 const Person = ({ id, name, number, persons, setPersons, deletePerson }) => {
-  const handleDeletePerson = () =>  deletePerson(id).then(deletedPerson => {
+  const handleDeletePerson = () =>  {
+    deletePerson(id)
     setPersons(
-      persons.filter(person => person.id != deletedPerson.id)
+      persons.filter(person => person.id != id)
     )
-  })
+  }
 
   return (<p>{name} {number} <button onClick={handleDeletePerson}>delete</button></p>);
 }
