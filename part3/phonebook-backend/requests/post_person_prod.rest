@@ -1,0 +1,42 @@
+POST https://fshelsinki-exercises.onrender.com/api/persons
+content-type: application/json
+
+{
+    "name": "Test Person",
+    "number": "1245-2353-1523"
+}
+
+###
+
+POST https://fshelsinki-exercises.onrender.com/api/persons
+content-type: application/json
+
+{ }
+
+###
+
+POST https://fshelsinki-exercises.onrender.com/api/persons
+content-type: application/json
+
+{
+    "name": "Test Person"
+}
+
+###
+
+POST https://fshelsinki-exercises.onrender.com/api/persons
+content-type: application/json
+
+{
+    "number": "1245-2353-1523"
+}
+
+###
+
+POST https://fshelsinki-exercises.onrender.com/api/persons
+content-type: application/json
+
+{
+    "name": "Test Person",
+    "number": "1245-2353-1323"
+}

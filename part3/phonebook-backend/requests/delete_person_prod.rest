@@ -1,0 +1,2 @@
+
+DELETE https://fshelsinki-exercises.onrender.com/api/persons/7870
