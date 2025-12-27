@@ -1,7 +1,12 @@
+const morgan = require('morgan')
 const express = require("express")
 const app = express()
 
 app.use(express.json())
+
+morgan.token('body', (req) => JSON.stringify(req.body))
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 let contacts = [
     { 
@@ -46,6 +51,30 @@ app.get("/info", (req, res) => {
     <p>Phonebook has info for ${contacts.length} people</p>
     <p>${date_time}</p>`
   )
+})
+
+app.post("/api/persons", (req, res) => {
+  let person = req.body
+
+  if (!person.name || !person.number) {
+    error = `${!person.name && 'name ' || ''}${!person.name && !person.number && 'and ' || ''}${!person.number && 'number ' || ''}${!person.name && !person.number && 'are' || 'is'} missing`
+
+    return res.status(400).json({ error })
+  }
+
+  const nameExists = contacts.find(contact => contact.name === person.name)
+
+  if (nameExists) {
+    return res.status(400).json({
+      error: "name must be unique"
+    })
+  }
+
+
+  const id = Math.floor(Math.random() * 10000)
+  const newPerson = { ...person, id }
+  contacts = contacts.concat(newPerson)
+  res.status(201).json(newPerson)
 })
 
 app.delete("/api/persons/:id", (req, res) => {

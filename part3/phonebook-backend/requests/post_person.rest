@@ -1,0 +1,42 @@
+POST http://localhost:3001/api/persons
+content-type: application/json
+
+{
+    "name": "Test Person",
+    "number": "1245-2353-1523"
+}
+
+###
+
+POST http://localhost:3001/api/persons
+content-type: application/json
+
+{ }
+
+###
+
+POST http://localhost:3001/api/persons
+content-type: application/json
+
+{
+    "name": "Test Person"
+}
+
+###
+
+POST http://localhost:3001/api/persons
+content-type: application/json
+
+{
+    "number": "1245-2353-1523"
+}
+
+###
+
+POST http://localhost:3001/api/persons
+content-type: application/json
+
+{
+    "name": "Test Person",
+    "number": "1245-2353-1323"
+}
