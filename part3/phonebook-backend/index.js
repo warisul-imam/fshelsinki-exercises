@@ -13,18 +13,34 @@ morgan.token('body', (req) => JSON.stringify(req.body))
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(error)
+}
+
 app.get("/api/persons", (req, res) => {
   Person.find({}).then(people => {
     res.json(people)
   })
 })
 
-app.get("/api/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res, next) => {
   const id = req.params.id
 
   Person.findById(id)
-    .then(person => res.json(person))
-    .catch(error => res.status(404).json({ error }))
+    .then(person => {
+      if (person) {
+        res.json(person)
+      } else {
+        res.status(404).end()
+      }
+    })
+    .catch(error => next(error))
 })
 
 app.get("/info", (req, res) => {
@@ -52,17 +68,25 @@ app.post("/api/persons", (req, res) => {
     .then(newPerson => res.status(201).json(newPerson))
 })
 
-app.delete("/api/persons/:id", (req, res) => {
+app.put("/api/persons/:id", (req, res, next) => {
   const id = req.params.id
-    Person.deleteOne({_id: id})
-    .then(result => {
-      if (result.deletedCount == 0) {
-        res.status(404).json({ error : "Person not found" })
-      } else {
-        res.status(204).end()
-      }
+  const updatedPersonData = req.body
+  Person.findByIdAndUpdate(id, updatedPersonData, { new: true })
+    .then(updatedPerson => {
+      console.log('updated person: ', updatedPerson)
+      res.json(updatedPerson)
     })
+    .catch(error => next(error))
 })
+
+app.delete("/api/persons/:id", (req, res, next) => {
+  const id = req.params.id
+  Person.findByIdAndDelete(id)
+    .then(result => res.status(204).end())
+    .catch(error => next(error))
+})
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
