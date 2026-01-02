@@ -1,9 +1,10 @@
-const cors = require("cors")
+require('dotenv').config()
+
 const express = require("express")
 const morgan = require("morgan")
 const app = express()
 
-// app.use(cors())
+const Person = require('./models/people')
 
 app.use(express.json())
 app.use(express.static('dist'))
@@ -12,49 +13,29 @@ morgan.token('body', (req) => JSON.stringify(req.body))
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-let contacts = [
-    { 
-      "id": "1",
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": "2",
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": "3",
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": "4",
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
-
 app.get("/api/persons", (req, res) => {
-   res.json(contacts)
+  Person.find({}).then(people => {
+    res.json(people)
+  })
 })
 
 app.get("/api/persons/:id", (req, res) => {
   const id = req.params.id
-  const person = contacts.find(person => person.id == id)
-  if (person) {
-    res.json(person)
-  } else {
-    res.status(404).end()
-  }
+
+  Person.findById(id)
+    .then(person => res.json(person))
+    .catch(error => res.status(404).json({ error }))
 })
 
 app.get("/info", (req, res) => {
   let date_time = Date()
-  res.send(`
-    <p>Phonebook has info for ${contacts.length} people</p>
-    <p>${date_time}</p>`
-  )
+  Person.find({})
+    .then(people => {
+      res.send(`
+        <p>Phonebook has info for ${people.length} people</p>
+        <p>${date_time}</p>
+      `)
+    })
 })
 
 app.post("/api/persons", (req, res) => {
@@ -66,35 +47,21 @@ app.post("/api/persons", (req, res) => {
     return res.status(400).json({ error })
   }
 
-  const nameExists = contacts.find(contact => contact.name === person.name)
-
-  if (nameExists) {
-    return res.status(400).json({
-      error: "name must be unique"
-    })
-  }
-
-
-  const id = Math.floor(Math.random() * 10000)
-  const newPerson = { ...person, id }
-  contacts = contacts.concat(newPerson)
-  res.status(201).json(newPerson)
+  const newPerson = new Person({ name: person.name, number: person.number })
+  newPerson.save()
+    .then(newPerson => res.status(201).json(newPerson))
 })
 
 app.delete("/api/persons/:id", (req, res) => {
   const id = req.params.id
-
-  const contact = contacts.find(contact => contact.id == id)
-
-  if (!contact) {
-    return res.status(404).json({
-      error: "person not found"
+    Person.deleteOne({_id: id})
+    .then(result => {
+      if (result.deletedCount == 0) {
+        res.status(404).json({ error : "Person not found" })
+      } else {
+        res.status(204).end()
+      }
     })
-  }
-
-  contacts = contacts.filter(person => person.id != id)
-
-  res.status(204).end()
 })
 
 const PORT = process.env.PORT || 3001
