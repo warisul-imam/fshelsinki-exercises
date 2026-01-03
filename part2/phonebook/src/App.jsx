@@ -23,9 +23,8 @@ const App = () => {
   const [notifMessage, setNotifMessage] = useState('')
 
   const notifTypes = {
-    CREATION_SUCCESS: 0,
-    UPDATE_SUCCESS: 1,
-    ERR_404: 2
+    SUC: 0,
+    ERR: 1,
   }
 
   const sendNotif = (type, msg) => {

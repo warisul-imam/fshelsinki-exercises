@@ -36,10 +36,10 @@ const AddContact = ({
                   : person
               )
             )
-            sendNotif(notifTypes.UPDATE_SUCCESS, `Updated ${updatedPerson.name}'s number to ${updatedPerson.number}`)
+            sendNotif(notifTypes.SUC, `Updated ${updatedPerson.name}'s number to ${updatedPerson.number}`)
           })
           .catch(err => {
-            sendNotif(notifTypes.ERR_404, `Information of ${updatedPersonObj.name} has already been removed from server.`)
+            sendNotif(notifTypes.ERR, `Information of ${updatedPersonObj.name} has already been removed from server.`)
             setPersons(persons.filter(person => person.name != updatedPersonObj.name))
           })
       }
@@ -49,7 +49,10 @@ const AddContact = ({
       createPerson(newPersonObj)
         .then(newPerson => {
           setPersons([...persons, newPerson])
-          sendNotif(notifTypes.CREATION_SUCCESS, `Added ${newPerson.name} to phonebook.`)
+          sendNotif(notifTypes.SUC, `Added ${newPerson.name} to phonebook.`)
+        })
+        .catch(axiosError => {
+          sendNotif(notifTypes.ERR, axiosError.response.data.error)
         })
     }
 

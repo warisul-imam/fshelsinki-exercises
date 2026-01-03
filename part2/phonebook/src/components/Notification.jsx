@@ -1,13 +1,13 @@
 const Notification = ({ notifTypes, notifType, msg }) => {
 
-    const style = notifType == notifTypes.CREATION_SUCCESS || notifType == notifTypes.UPDATE_SUCCESS ? {
+    const style = notifType == notifTypes.SUC ? {
         backgroundColor: '#dfdfdfff',
         color: '#00882bff',
         borderRadius: 20,
         padding: 20,
         border: '3px solid #00882bff'
     }
-    : notifType == notifTypes.ERR_404 ? {
+    : notifType == notifTypes.ERR ? {
         backgroundColor: '#dfdfdfff',
         color: "#ff5e5eff",
         borderRadius: 20,
